@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { createClient } from '@/lib/supabase/server';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 
 
@@ -13,15 +12,6 @@ export async function getProducts() {
   return { products }
 }
 
-
-async function getStockWithWarehouse() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('stock')
-    .select('amount, product:product_id(id, nombre), warehouse:warehouse_id(id, name)')
-    .order('product_id');
-  return data ?? [];
-}
 
 export default async function DashboardProducts() {
   const { products } = await getProducts();
