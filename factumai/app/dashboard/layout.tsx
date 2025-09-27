@@ -23,17 +23,35 @@ export default function DashboardLayout({
           <Link href="/dashboard">FactumAI</Link>
         </div>
         <nav className="p-4 space-y-2 text-sm">
-          <Link className="block rounded-md px-3 py-2 hover:bg-accent" href="/dashboard">
+          <Link
+            className="block rounded-md px-3 py-2 hover:bg-accent"
+            href="/dashboard"
+          >
             Home
           </Link>
-          <Link className="block rounded-md px-3 py-2 hover:bg-accent" href="/dashboard/clients">
+          <Link
+            className="block rounded-md px-3 py-2 hover:bg-accent"
+            href="/dashboard/clients"
+          >
             Clients
           </Link>
-          <Link className="block rounded-md px-3 py-2 hover:bg-accent" href="/dashboard/products">
+          <Link
+            className="block rounded-md px-3 py-2 hover:bg-accent"
+            href="/dashboard/products"
+          >
             Products & Stock
           </Link>
-          <Link className="block rounded-md px-3 py-2 hover:bg-accent" href="/dashboard/warehouses">
+          <Link
+            className="block rounded-md px-3 py-2 hover:bg-accent"
+            href="/dashboard/warehouses"
+          >
             Warehouses
+          </Link>
+          <Link
+            className="block rounded-md px-3 py-2 hover:bg-accent"
+            href="/dashboard/admin-finan"
+          >
+            Administracion & finanzas
           </Link>
         </nav>
       </aside>
@@ -70,5 +88,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-
-
