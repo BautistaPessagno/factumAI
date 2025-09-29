@@ -3,10 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 
 async function getCounts() {
   const supabase = await createClient();
-  const [{ count: clientsCount }, { count: productsCount }] = await Promise.all([
-    supabase.from("clients").select("id", { count: "exact", head: true }),
-    supabase.from("products").select("id", { count: "exact", head: true }),
-  ]);
+  const [{ count: clientsCount }, { count: productsCount }] = await Promise.all(
+    [
+      supabase.from("clients").select("id", { count: "exact", head: true }),
+      supabase.from("products").select("id", { count: "exact", head: true }),
+    ],
+  );
 
   const { data: lowStock } = await supabase
     .from("stock")
@@ -15,7 +17,11 @@ async function getCounts() {
     .order("amount", { ascending: true })
     .limit(5);
 
-  return { clientsCount: clientsCount ?? 0, productsCount: productsCount ?? 0, lowStock: lowStock ?? [] };
+  return {
+    clientsCount: clientsCount ?? 0,
+    productsCount: productsCount ?? 0,
+    lowStock: lowStock ?? [],
+  };
 }
 
 export default async function Dashboard() {
@@ -56,10 +62,13 @@ export default async function Dashboard() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">All good. No low stock items.</p>
+            <p className="text-sm text-muted-foreground">
+              All good. No low stock items.
+            </p>
           )}
         </CardContent>
       </Card>
     </div>
   );
 }
+
