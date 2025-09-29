@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/src/db/client";
+import { products, stock, warehouse } from "@/src/db/schema";
+import { asc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,21 +11,20 @@ export const dynamic = "force-dynamic";
 
 async function createProduct(formData: FormData) {
   "use server";
-  const supabase = await createClient();
   const nombre = String(formData.get("nombre") || "").trim();
   const barcode = String(formData.get("barcode") || "").trim();
   const categoria = formData.get("categoria")
     ? Number(formData.get("categoria"))
     : null;
 
-  const { data, error } = await supabase
-    .from("products")
-    .insert({ nombre, barcode, categoria })
-    .select("id")
-    .single();
+  const inserted = await db
+    .insert(products)
+    .values({ nombre, barcode, categoria })
+    .returning({ id: products.id });
 
-  if (error) {
-    throw error;
+  const data = inserted?.[0];
+  if (!data?.id) {
+    throw new Error("Failed to create product");
   }
 
   const amount = formData.get("amount")
@@ -34,9 +35,9 @@ async function createProduct(formData: FormData) {
     : null;
 
   if (data?.id && amount && warehouseId) {
-    await supabase.from("stock").insert({
-      product_id: data.id,
-      warehouse_id: warehouseId,
+    await db.insert(stock).values({
+      productId: data.id,
+      warehouseId,
       amount,
     });
   }
@@ -45,11 +46,10 @@ async function createProduct(formData: FormData) {
 }
 
 export default async function NewProductPage() {
-  const supabase = await createClient();
-  const { data: warehouses } = await supabase
-    .from("warehouse")
-    .select("id, name")
-    .order("name");
+  const warehouses = await db
+    .select({ id: warehouse.id, name: warehouse.name })
+    .from(warehouse)
+    .orderBy(asc(warehouse.name));
 
   return (
     <div className="max-w-2xl">

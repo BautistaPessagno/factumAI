@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/src/db/client";
+import { warehouse } from "@/src/db/schema";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,11 +10,10 @@ export const dynamic = "force-dynamic";
 
 async function createWarehouse(formData: FormData) {
   "use server";
-  const supabase = await createClient();
   const name = String(formData.get("name") || "").trim();
   const location = String(formData.get("location") || "").trim();
 
-  await supabase.from("warehouse").insert({ name, location });
+  await db.insert(warehouse).values({ name, location });
   redirect("/dashboard/warehouses");
 }
 

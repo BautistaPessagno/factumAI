@@ -1,26 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/src/db/client";
+import { clients, products, stock } from "@/src/db/schema";
+import { asc, count, eq, lte } from "drizzle-orm";
 
 async function getCounts() {
-  const supabase = await createClient();
-  const [{ count: clientsCount }, { count: productsCount }] = await Promise.all(
-    [
-      supabase.from("clients").select("id", { count: "exact", head: true }),
-      supabase.from("products").select("id", { count: "exact", head: true }),
-    ],
-  );
+  const [{ count: clientsCount }] = await db.select({ count: count() }).from(clients);
+  const [{ count: productsCount }] = await db.select({ count: count() }).from(products);
 
-  const { data: lowStock } = await supabase
-    .from("stock")
-    .select("amount, product:product_id(nombre)")
-    .lte("amount", 5)
-    .order("amount", { ascending: true })
-    .limit(5);
+  const lowStockRows = await db
+    .select({
+      amount: stock.amount,
+      productId: products.id,
+      productNombre: products.nombre,
+    })
+    .from(stock)
+    .leftJoin(products, eq(stock.productId, products.id))
+    .where(lte(stock.amount, 5))
+    .orderBy(asc(stock.amount), asc(products.nombre));
+
+  const lowStock = lowStockRows.map((row) => ({
+    amount: row.amount,
+    product: { nombre: row.productNombre ?? null },
+  }));
 
   return {
-    clientsCount: clientsCount ?? 0,
-    productsCount: productsCount ?? 0,
-    lowStock: lowStock ?? [],
+    clientsCount: Number(clientsCount ?? 0),
+    productsCount: Number(productsCount ?? 0),
+    lowStock,
   };
 }
 
@@ -54,12 +60,20 @@ export default async function Dashboard() {
         <CardContent>
           {lowStock.length ? (
             <ul className="space-y-2 text-sm">
-              {lowStock.map((s: any, idx: number) => (
-                <li key={idx} className="flex items-center justify-between">
-                  <span>{s.product?.nombre ?? "Unnamed"}</span>
-                  <span className="text-muted-foreground">{s.amount}</span>
-                </li>
-              ))}
+              {lowStock.map(
+                (
+                  s: {
+                    amount: number | null;
+                    product: { nombre: string | null };
+                  },
+                  idx: number,
+                ) => (
+                  <li key={idx} className="flex items-center justify-between">
+                    <span>{s.product?.nombre ?? "Unnamed"}</span>
+                    <span className="text-muted-foreground">{s.amount}</span>
+                  </li>
+                ),
+              )}
             </ul>
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -71,4 +85,3 @@ export default async function Dashboard() {
     </div>
   );
 }
-

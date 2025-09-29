@@ -1,32 +1,48 @@
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/src/db/client";
+import { warehouse, stock, products } from "@/src/db/schema";
+import { asc, eq } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 async function getWarehouse(id: number) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("warehouse")
-    .select("id, name, location, created_at")
-    .eq("id", id)
-    .single();
-  return data;
+  const rows = await db
+    .select({
+      id: warehouse.id,
+      name: warehouse.name,
+      location: warehouse.location,
+      createdAt: warehouse.createdAt,
+    })
+    .from(warehouse)
+    .where(eq(warehouse.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 async function getWarehouseProducts(id: number) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("stock")
-    .select("amount, product:product_id(id, nombre, barcode, categoria)")
-    .eq("warehouse_id", id)
-    .order("product_id");
-  return data ?? [];
+  const rows = await db
+    .select({
+      amount: stock.amount,
+      product: {
+        id: products.id,
+        nombre: products.nombre,
+        barcode: products.barcode,
+        categoria: products.categoria,
+      },
+    })
+    .from(stock)
+    .leftJoin(products, eq(stock.productId, products.id))
+    .where(eq(stock.warehouseId, id))
+    .orderBy(asc(stock.productId));
+  return rows;
 }
 
-export default async function WarehouseDetail({ params }: { params: { id: string } }) {
+export default async function WarehouseDetail({
+  params,
+}: {
+  params: { id: string };
+}) {
   const warehouseId = Number(params.id);
-  const [warehouse, stock] = await Promise.all([
-    getWarehouse(warehouseId),
-    getWarehouseProducts(warehouseId),
-  ]);
+  const warehouseRow = await getWarehouse(warehouseId);
+  const stockRows = await getWarehouseProducts(warehouseId);
 
   return (
     <div className="space-y-6">
@@ -35,23 +51,25 @@ export default async function WarehouseDetail({ params }: { params: { id: string
           <CardTitle>Warehouse info</CardTitle>
         </CardHeader>
         <CardContent>
-          {warehouse ? (
+          {warehouseRow ? (
             <div className="grid sm:grid-cols-3 gap-4 text-sm">
               <div>
                 <div className="text-muted-foreground">Name</div>
-                <div>{warehouse.name}</div>
+                <div>{warehouseRow.name}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Location</div>
-                <div>{warehouse.location || '-'}</div>
+                <div>{warehouseRow.location || "-"}</div>
               </div>
               <div>
                 <div className="text-muted-foreground">Created</div>
-                <div>{warehouse.created_at?.slice(0,10) || '-'}</div>
+                <div>{warehouseRow.createdAt?.slice(0, 10) || "-"}</div>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Warehouse not found.</p>
+            <p className="text-sm text-muted-foreground">
+              Warehouse not found.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -61,7 +79,7 @@ export default async function WarehouseDetail({ params }: { params: { id: string
           <CardTitle>Products in this warehouse</CardTitle>
         </CardHeader>
         <CardContent>
-          {stock.length ? (
+          {stockRows.length ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-left text-muted-foreground">
@@ -73,11 +91,13 @@ export default async function WarehouseDetail({ params }: { params: { id: string
                   </tr>
                 </thead>
                 <tbody>
-                  {stock.map((row: any, idx: number) => (
+                  {stockRows.map((row: any, idx: number) => (
                     <tr key={idx} className="border-t">
-                      <td className="py-2">{row.product?.nombre ?? 'Unnamed'}</td>
-                      <td className="py-2">{row.product?.barcode ?? '-'}</td>
-                      <td className="py-2">{row.product?.categoria ?? '-'}</td>
+                      <td className="py-2">
+                        {row.product?.nombre ?? "Unnamed"}
+                      </td>
+                      <td className="py-2">{row.product?.barcode ?? "-"}</td>
+                      <td className="py-2">{row.product?.categoria ?? "-"}</td>
                       <td className="py-2">{row.amount ?? 0}</td>
                     </tr>
                   ))}
@@ -85,12 +105,12 @@ export default async function WarehouseDetail({ params }: { params: { id: string
               </table>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No products in this warehouse.</p>
+            <p className="text-sm text-muted-foreground">
+              No products in this warehouse.
+            </p>
           )}
         </CardContent>
       </Card>
     </div>
   );
 }
-
-

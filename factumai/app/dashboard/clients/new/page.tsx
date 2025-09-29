@@ -1,26 +1,28 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { db } from "@/src/index";
+import { clients } from "@/src/db/schema";
 
 export const dynamic = "force-dynamic";
 
 async function createClientRow(formData: FormData) {
   "use server";
-  const supabase = await createClient();
   const name = String(formData.get("name") || "").trim();
   const cuit = String(formData.get("cuit") || "").trim();
   const iibb = String(formData.get("iibb") || "").trim();
   const startActivity = String(formData.get("start_activity") || "").trim();
 
-  await supabase.from("clients").insert({
-    name,
-    cuit,
-    iibb,
-    start_activity: startActivity || null,
-  });
+  const client = {
+    name: name,
+    cuit: cuit,
+    iibb: iibb,
+    start_activity: startActivity,
+  };
+
+  await db.insert(clients).values(client);
 
   redirect("/dashboard/clients");
 }
@@ -59,5 +61,3 @@ export default function NewClientPage() {
     </div>
   );
 }
-
-

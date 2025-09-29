@@ -1,17 +1,18 @@
 //dashboard clasico con opciones para ver los productos, stock, finanzas y ventas
 
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/src/index";
+import { clients } from "@/src/db/schema";
+import { asc } from "drizzle-orm";
 
-export async function getClients() {
-  const supabase = await createClient();
-  const { data: clients } = await supabase.from("clients").select();
+async function getClients() {
+  const rows = await db.select().from(clients).orderBy(asc(clients.id));
 
-  return { clients };
+  return rows;
 }
 
 export default async function DashboardClients() {
-  const { clients } = await getClients();
+  const clients = await getClients();
   return (
     <div>
       <div className="mb-4">

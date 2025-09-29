@@ -1,11 +1,20 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { db } from "@/src/db/client";
+import { warehouse } from "@/src/db/schema";
+import { asc } from "drizzle-orm";
 
 async function getWarehouses() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("warehouse").select("id, name, location, created_at").order("name");
-  return data ?? [];
+  const rows = await db
+    .select({
+      id: warehouse.id,
+      name: warehouse.name,
+      location: warehouse.location,
+      createdAt: warehouse.createdAt,
+    })
+    .from(warehouse)
+    .orderBy(asc(warehouse.name));
+  return rows;
 }
 
 export default async function WarehousesPage() {
@@ -33,7 +42,7 @@ export default async function WarehousesPage() {
                     <tr key={w.id} className="border-top">
                       <td className="py-2">{w.name}</td>
                       <td className="py-2">{w.location || '-'}</td>
-                      <td className="py-2">{w.created_at?.slice(0,10) || '-'}</td>
+                      <td className="py-2">{w.createdAt?.slice(0,10) || '-'}</td>
                       <td className="py-2 text-right">
                         <Link className="underline underline-offset-4" href={`/dashboard/warehouses/${w.id}`}>View</Link>
                       </td>
