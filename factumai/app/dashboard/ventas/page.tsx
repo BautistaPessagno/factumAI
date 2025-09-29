@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
+import VentaButton from "./VentaButton";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +43,7 @@ export default async function VentasPage() {
       </div>
 
       <div className="fixed left-1/2 -translate-x-1/2 bottom-10">
-        <Button size="lg" className="px-10 py-6 text-lg">
-          Venta
-        </Button>
+        <VentaButton />
       </div>
     </div>
   );

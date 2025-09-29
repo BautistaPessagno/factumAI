@@ -43,8 +43,12 @@ export default async function DashboardProducts() {
                 <tr key={product.id}>
                   <td className="px-3 py-2 border">{product.id}</td>
                   <td className="px-3 py-2 border">{product.nombre}</td>
-                  <td className="px-3 py-2 border">{product.categoria}</td>
-                  <td className="px-3 py-2 border">{product.totalAmount ?? 0}</td>
+                  <td className="px-3 py-2 border">
+                    {product.categoria ?? "Ninguna"}
+                  </td>
+                  <td className="px-3 py-2 border">
+                    {product.totalAmount ?? 0}
+                  </td>
                 </tr>
               ))}
             </tbody>
