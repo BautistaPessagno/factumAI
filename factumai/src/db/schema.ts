@@ -9,7 +9,6 @@ import {
   primaryKey,
   date,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const stock = pgTable(
   "stock",

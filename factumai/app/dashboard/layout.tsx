@@ -3,6 +3,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { AuthButton } from "@/components/auth-button";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SideChatToggle } from "@/components/side-chat-toggle";
 import { Plus } from "lucide-react";
 import {
   DropdownMenu,
@@ -62,7 +63,7 @@ export default function DashboardLayout({
         </nav>
       </aside>
       <div className="flex flex-col min-h-screen">
-        <header className="h-16 border-b flex items-center justify-between px-4 gap-4">
+        <header className="h-16 border-b flex items-center justify-between px-4 gap-4 relative">
           <div className="w-full max-w-md">
             <Input placeholder="Search…" />
           </div>
@@ -87,6 +88,7 @@ export default function DashboardLayout({
             </DropdownMenu>
             <ThemeSwitcher />
             <AuthButton />
+            <SideChatToggle />
           </div>
         </header>
         <main className="p-6 flex-1 bg-background">{children}</main>
