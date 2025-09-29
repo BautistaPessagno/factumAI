@@ -63,6 +63,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  /* Chat-specific utilities */
+  .markdown-content {
+    @apply prose prose-sm md:prose-base max-w-none prose-headings:mt-3 prose-p:leading-relaxed prose-pre:whitespace-pre-wrap;
   }
 }
