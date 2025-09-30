@@ -38,7 +38,7 @@ export default async function WarehousesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {warehouses.map((w: any) => (
+                  {warehouses.map((w) => (
                     <tr key={w.id} className="border-top">
                       <td className="py-2">{w.name}</td>
                       <td className="py-2">{w.location || '-'}</td>

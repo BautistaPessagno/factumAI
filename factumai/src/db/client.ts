@@ -5,7 +5,6 @@ import * as relations from "./relations";
 
 // Reuse the connection in dev to avoid creating too many connections
 declare global {
-  // eslint-disable-next-line no-var
   var __drizzle__: ReturnType<typeof drizzle> | undefined;
 }
 

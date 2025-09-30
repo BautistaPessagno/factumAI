@@ -39,7 +39,7 @@ export default async function DashboardProducts() {
           </thead>
           {items && items.length > 0 ? (
             <tbody>
-              {items.map((product: any) => (
+              {items.map((product) => (
                 <tr key={product.id}>
                   <td className="px-3 py-2 border">{product.id}</td>
                   <td className="px-3 py-2 border">{product.nombre}</td>

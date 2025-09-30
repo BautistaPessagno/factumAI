@@ -28,7 +28,7 @@ export default async function DashboardClients() {
           </thead>
           {clients && clients.length > 0 ? (
             <tbody>
-              {clients.map((client: any) => (
+              {clients.map((client) => (
                 <tr key={client.id}>
                   <td className="px-3 py-2 border">{client.name}</td>
                   <td className="px-3 py-2 border">{client.cuit}</td>

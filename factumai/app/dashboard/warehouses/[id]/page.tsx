@@ -38,9 +38,10 @@ async function getWarehouseProducts(id: number) {
 export default async function WarehouseDetail({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const warehouseId = Number(params.id);
+  const { id } = await params;
+  const warehouseId = Number(id);
   const warehouseRow = await getWarehouse(warehouseId);
   const stockRows = await getWarehouseProducts(warehouseId);
 
@@ -91,7 +92,7 @@ export default async function WarehouseDetail({
                   </tr>
                 </thead>
                 <tbody>
-                  {stockRows.map((row: any, idx: number) => (
+                  {stockRows.map((row, idx: number) => (
                     <tr key={idx} className="border-t">
                       <td className="py-2">
                         {row.product?.nombre ?? "Unnamed"}
