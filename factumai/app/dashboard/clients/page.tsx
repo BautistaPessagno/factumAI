@@ -1,7 +1,7 @@
 //dashboard clasico con opciones para ver los productos, stock, finanzas y ventas
 
 import React from "react";
-import { db } from "@/src/db/client";
+import { db } from "@/src/index";
 import { clients } from "@/src/db/schema";
 import { asc } from "drizzle-orm";
 

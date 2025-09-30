@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { db } from "@/src/db/client";
+import { db } from "@/src/index";
 import { clients } from "@/src/db/schema";
 
 export const dynamic = "force-dynamic";
