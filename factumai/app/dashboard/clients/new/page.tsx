@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { db } from "@/src/index";
+import { db } from "@/src/db/client";
 import { clients } from "@/src/db/schema";
 
 export const dynamic = "force-dynamic";
@@ -16,11 +16,11 @@ async function createClientRow(formData: FormData) {
   const startActivity = String(formData.get("start_activity") || "").trim();
 
   const client = {
-    name: name,
-    cuit: cuit,
-    iibb: iibb,
-    start_activity: startActivity,
-  };
+    name,
+    cuit,
+    iibb,
+    startActivity: startActivity || null,
+  } as const;
 
   await db.insert(clients).values(client);
 
